@@ -1,0 +1,6 @@
+{
+  "name": "UAV Organ Twin Console",
+  "description": "Real-Time Digital Twin System for Autonomous Organ Transportation Using Medical Drones",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
