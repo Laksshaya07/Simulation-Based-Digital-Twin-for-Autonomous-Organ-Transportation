@@ -44,9 +44,19 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-/* Hide standard header spacing and toolbar for a fully custom web console experience */
+/* Header & Sidebar Controls */
 [data-testid="stHeader"] {
-    display: none !important;
+    background-color: transparent !important;
+    z-index: 100 !important;
+}
+[data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    color: #ffffff !important;
+    background-color: #18181b !important;
+    border: 1px solid #27272a !important;
+    border-radius: 6px !important;
+    margin: 8px !important;
 }
 [data-testid="stToolbar"] {
     right: 1.5rem !important;
@@ -419,38 +429,40 @@ if ml_metrics:
     importances = ml_metrics.get("feature_importances", {})
     sorted_importances = sorted(importances.items(), key=lambda x: x[1], reverse=True)
     
-    importance_html = ""
+    importance_html_items = []
     for f, imp in sorted_importances:
         f_clean = f.replace("_", " ").title()
-        importance_html += f"""
-        <div style="margin-top: 6px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #a1a1aa; margin-bottom: 1px;">
-                <span>{f_clean}</span>
-                <span style="font-family: monospace;">{imp*100:.1f}%</span>
-            </div>
-            <div style="background-color: #27272a; height: 4px; border-radius: 2px; width: 100%;">
-                <div style="background-color: #3b82f6; width: {imp*100}%; height: 100%; border-radius: 2px;"></div>
-            </div>
-        </div>
-        """
+        importance_html_items.append(
+            f'<div style="margin-top: 6px;">'
+            f'<div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #a1a1aa; margin-bottom: 1px;">'
+            f'<span>{f_clean}</span>'
+            f'<span style="font-family: monospace;">{imp*100:.1f}%</span>'
+            f'</div>'
+            f'<div style="background-color: #27272a; height: 4px; border-radius: 2px; width: 100%;">'
+            f'<div style="background-color: #3b82f6; width: {imp*100}%; height: 100%; border-radius: 2px;"></div>'
+            f'</div>'
+            f'</div>'
+        )
+    importance_html = "".join(importance_html_items)
         
-    st.sidebar.markdown(f"""
-    <div style="background-color: #121214; padding: 15px; border-radius: 8px; border: 1px solid #27272a; margin-bottom: 15px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-            <span style="font-weight: bold; font-size: 1.0em; color: #ffffff;">🌲 RandomForest Dispatcher</span>
-            <span style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.75em; font-weight: bold;">
-                ACC: {ml_metrics.get('accuracy', 0.95)*100:.1f}%
-            </span>
-        </div>
-        <div style="font-size: 0.82em; color: #a1a1aa; line-height: 1.4; margin-bottom: 8px;">
-            Trained on <strong style="color: #fafafa;">{ml_metrics.get('n_samples', 1200)}</strong> historical medical flights in Chennai.
-        </div>
-        <div style="font-size: 0.8em; font-weight: 600; color: #fafafa; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
-            Feature Importance Weights:
-        </div>
-        {importance_html}
-    </div>
-    """, unsafe_allow_html=True)
+    sidebar_card_html = (
+        f'<div style="background-color: #121214; padding: 15px; border-radius: 8px; border: 1px solid #27272a; margin-bottom: 15px;">'
+        f'<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">'
+        f'<span style="font-weight: bold; font-size: 1.0em; color: #ffffff;">🌲 RandomForest Dispatcher</span>'
+        f'<span style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.75em; font-weight: bold;">'
+        f'ACC: {ml_metrics.get("accuracy", 0.95)*100:.1f}%'
+        f'</span>'
+        f'</div>'
+        f'<div style="font-size: 0.82em; color: #a1a1aa; line-height: 1.4; margin-bottom: 8px;">'
+        f'Trained on <strong style="color: #fafafa;">{ml_metrics.get("n_samples", 1200)}</strong> historical medical flights in Chennai.'
+        f'</div>'
+        f'<div style="font-size: 0.8em; font-weight: 600; color: #fafafa; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">'
+        f'Feature Importance Weights:'
+        f'</div>'
+        f'{importance_html}'
+        f'</div>'
+    )
+    st.sidebar.markdown(sidebar_card_html, unsafe_allow_html=True)
 
 # Quick Seed Utility (Grader cheat code)
 st.sidebar.subheader("🧪 Rapid Testing Suite")
